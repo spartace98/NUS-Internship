@@ -81,8 +81,7 @@ for i in range(1, 5):
     print_results(results)
 
     if i < 5:
-        # prints the ranges to check
-        # generates new range to loop,
+        # prints the ranges to check and generates new range to loop
         C_vals, epsilon_vals = new_range(results)
 
 final_end = time.time()
