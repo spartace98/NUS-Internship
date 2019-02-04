@@ -85,7 +85,11 @@ def best_alpha(alpha_vals):
         best_alpha(new_alpha_vals)
 
     else:
-        print(results.max())
+        temp_results = indiv_score(alpha_vals, results)
+        best_score = temp_results.max(axis = 1)
+        temp_alpha = get_alpha(temp_results, best_score)
+        print(temp_results)
+        print(best_score, temp_alpha)
 
 print('Starting analysis')
 best_alpha(alpha_vals)
