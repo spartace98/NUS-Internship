@@ -54,9 +54,11 @@ def indiv_score(alpha_vals, results):
 	# create new dataframe and start over
 
 def best_alpha(alpha_vals):
+    
+    temp_scores = np.zeros((1,5))
+    results = DataFrame(data = temp_scores, columns = alpha_vals, index = ['score'])
+    
     if alpha_vals[1] - alpha_vals[0] > 1:
-        temp_scores = np.zeros((1,5))
-        results = DataFrame(data = temp_scores, columns = alpha_vals, index = ['score'])
         
         temp_results = indiv_score(alpha_vals, results)
         best_score = temp_results.max(axis = 1)
@@ -72,14 +74,14 @@ def best_alpha(alpha_vals):
         # if the results are on the extreme ends
         if temp_alpha == alpha_vals[0] or temp_alpha == alpha[-1]:
             new_interval = half_range
+            new_alpha_vals = np.arange(alpha_vals[1] - new_interval * 4, alpha_vals[1] + 1, new_interval)
             
         else:
             new_interval = half_range / 2
-        
-        new_alpha_vals = np.arange(range_min, (range_max + 1), new_interval)
+            new_alpha_vals = np.arange(range_min, (range_max + 1), new_interval)
         
         print(new_interval)
-        print(half_range, range_min, range_max)
+        print(range_min, range_max)
         print(new_alpha_vals)
 
         best_alpha(new_alpha_vals)
