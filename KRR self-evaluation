@@ -1,5 +1,4 @@
 # KERNEL RIDGE REGRESSION PROGRAM
-
 import numpy as np
 import time as time
 
@@ -8,9 +7,7 @@ from sklearn.model_selection import cross_val_score
 from sklearn.kernel_ridge import KernelRidge
 from sklearn.metrics import make_scorer
 
-data = np.load('data_fold6.npz')
-# displays the titles of the files inside the npz file
-file_names = data.files
+data = np.load('data_fold15.npz')
 # reason for split is because train_test_subs_X[:i] is tuple not array type
 training_set_X = np.concatenate(data['train_valid_x'])
 # fluid intelligence at index 3 column of training set
@@ -37,8 +34,8 @@ def get_alpha(dataframe, val):
 def indiv_score(alpha_vals, results):
     for alpha_input in alpha_vals:
         start = time.time()
-        krr = KernelRidge(alpha = alpha_input)
-        cvs = cross_val_score(scoring = pcc_scorer, estimator = krr, X = training_set_X, y = training_set_y, cv = 5)
+        krr = KernelRidge(alpha = alpha_input, kernel = 'linear')
+        cvs = cross_val_score(scoring = pcc_scorer, estimator = krr, X = training_set_X, y = training_set_y, cv = 19)
         results[alpha_input] = cvs.mean()
         end = time.time()
         duration = end - start
@@ -46,52 +43,62 @@ def indiv_score(alpha_vals, results):
     
     return results
 
+# based on the best alpha value and the previous alpha inputs, evaluates the next set of alpha inputs
+def new_array(temp_alpha, alpha_vals):
+    old_interval = alpha_vals[1] - alpha_vals[0]
+    range_min, range_max = temp_alpha - old_interval, temp_alpha + old_interval
+
+    # if the best alpha values were at the extreme ends of the alpha inputs
+    if temp_alpha == alpha_vals[0]:
+            new_interval = old_interval
+            new_alpha_vals = np.arange(alpha_vals[1] - new_interval * 4, alpha_vals[1] + 1, new_interval)
+
+    elif temp_alpha == alpha_vals[-1]:
+        new_interval = old_interval
+        new_alpha_vals = np.arange(alpha_vals[-2], alpha_vals[-2] + new_interval * 4 + 1, new_interval)
+            
+    else:
+        new_interval = old_interval / 2
+        new_alpha_vals = np.arange(range_min, (range_max + 1), new_interval)
+
+    return (new_interval, new_alpha_vals)
+
+# evaluates and prints out the result dataframe, best score and best alpha value for each loop
+# returns the best alpha value 
+def get_results(alpha_vals, results):
+        temp_results = indiv_score(alpha_vals, results)
+        best_score = temp_results.max(axis = 1)
+        temp_alpha = get_alpha(temp_results, best_score)
+
+        print(temp_results)
+        print('Best Pearson Score:', best_score)
+        print('Best Alpha Value:', temp_alpha)
+
+        return temp_alpha
+
 # if the difference betweeen 2 consec values are more than 1, continue the loop
 	# refreshes the dataframe
 	# evaluates the scores for each alpha
 	# stores in the dataframe
 	# finds the best score
 	# create new dataframe and start over
-
 def best_alpha(alpha_vals):
-    
     temp_scores = np.zeros((1,5))
     results = DataFrame(data = temp_scores, columns = alpha_vals, index = ['score'])
     
     if alpha_vals[1] - alpha_vals[0] > 1:
-        
-        temp_results = indiv_score(alpha_vals, results)
-        best_score = temp_results.max(axis = 1)
-        temp_alpha = get_alpha(temp_results, best_score)
-        
-        print(temp_results)
-        print(best_score)
-        print(temp_alpha)
-        
-        half_range = alpha_vals[1] - alpha_vals[0]
-        range_min, range_max = temp_alpha - half_range, temp_alpha + half_range
+        temp_alpha = get_results(alpha_vals, results)
+    
+        new_interval, new_alpha_vals = new_array(temp_alpha, alpha_vals)
+        print('New Interval:', new_interval)
+        print('New Alpha Values:', new_alpha_vals)
 
-        # if the results are on the extreme ends
-        if temp_alpha == alpha_vals[0] or temp_alpha == alpha[-1]:
-            new_interval = half_range
-            new_alpha_vals = np.arange(alpha_vals[1] - new_interval * 4, alpha_vals[1] + 1, new_interval)
-            
-        else:
-            new_interval = half_range / 2
-            new_alpha_vals = np.arange(range_min, (range_max + 1), new_interval)
-        
-        print(new_interval)
-        print(range_min, range_max)
-        print(new_alpha_vals)
-
+        # begins new loop with new alpha vals
         best_alpha(new_alpha_vals)
 
     else:
-        temp_results = indiv_score(alpha_vals, results)
-        best_score = temp_results.max(axis = 1)
-        temp_alpha = get_alpha(temp_results, best_score)
-        print(temp_results)
-        print(best_score, temp_alpha)
+        get_results(alpha_vals, results)
 
+# Officially Starts the Loop
 print('Starting analysis')
-best_alpha(alpha_vals)
+best_alpha(alpha_vals) 
