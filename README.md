@@ -75,6 +75,8 @@ Conclusion
 -
 The mean scores for the Support Vector Regression, Elastic Net and Kernel Ridge Regression are 0.272, 0.231 and 0.253 respectively. This demonstrates that there is a correlation between functional connectivity data and fluid intelligence.
 
-The results also show that among the three models used, the Support Vector Regression model is the best model to analyse the relationship between functional connectivity data and fluid intelligence- achieving the highest accuracy between predicted values and actual values of fluid intelligence data. 
+The results also show that among the three models used, the Support Vector Regression model is the best model to analyse the relationship between functional connectivity data and fluid intelligence- achieving the highest precision between predicted values and actual values of fluid intelligence data. 
+
+The results also demonstrated that for Elastic Net, L2 regularisation is preferential. This indicates that there is very high variance between each subject's fc data.
 
 It is observed that SVR model is the most computationally intensive, as more than 36 hours is required to train each fold. ELN is less computationally intensive and takes about 16 hours per fold. It is, however, least computationally intensive to train a KRR model, which takes less than 1 hour.
